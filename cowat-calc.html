@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+
+<head>
+	<meta charset="utf-8">
+	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=yes">
+
+	<title></title>
+	<style media="screen">
+		#calc{
+			padding: 25px;
+		}
+		#cowat{
+			margin-top: 50px;
+		}
+	</style>
+</head>
+
+<body class="bg-light">
+	<div class="container">
+		<div class="py-5 text-center">
+
+			<h2>COWAT-FAS Test Norm Calculator</h2>
+
+		</div>
+
+
+		<div class="border rounded">
+			<form action="#" id="calc">
+
+				<!-- Input data -->
+				<div class="form-group row">
+					<label for="years1" class="col-sm-2 col-form-label">Years of education</label>
+					<div class="col-sm-5">
+						<input type="number" class="form-control " id="edu" min="8" max="23" placeholder="8 - 23 years" required>
+	  			</div>
+				</div>
+
+
+				<!-- Result -->
+				<div id="cowat">
+
+					<div class="form-group row">
+						<label for="scaled-score" class="col-sm-2 col-form-label">F</label>
+						<div class="col-sm-2">
+							<input type="number" class="form-control" id="f" min="0">
+						</div>
+						<div class="col-sm-1">
+
+						</div>
+						<div class="col-sm-2">
+							<input type="text" class="form-control" id="t-score-f" placeholder="T-Score" readonly>
+		  			</div>
+					</div>
+					<div class="form-group row">
+						<label for="scaled-score" class="col-sm-2 col-form-label">A</label>
+						<div class="col-sm-2">
+							<input type="number" class="form-control" id="a" min="0">
+						</div>
+						<div class="col-sm-1">
+
+						</div>
+						<div class="col-sm-2">
+							<input type="text" class="form-control" id="t-score-a" placeholder="T-Score" readonly>
+		  			</div>
+					</div>
+					<div class="form-group row">
+						<label for="scaled-score" class="col-sm-2 col-form-label">S</label>
+						<div class="col-sm-2">
+							<input type="number" class="form-control" id="s" min="0">
+						</div>
+						<div class="col-sm-1">
+
+						</div>
+						<div class="col-sm-2">
+							<input type="text" class="form-control" id="t-score-s" placeholder="T-Score" readonly>
+		  			</div>
+					</div>
+
+					<div class="form-group row">
+						<label for="scaled-score" class="col-sm-2 col-form-label">Total</label>
+						<div class="col-sm-2">
+							<input type="number" class="form-control" id="total">
+						</div>
+						<div class="col-sm-1">
+
+						</div>
+						<div class="col-sm-2">
+							<input type="text" class="form-control" id="t-score-total" placeholder="T-Score" readonly>
+		  			</div>
+					</div>
+
+				</div>
+
+						<div class="form-group row">
+							<div class="col-sm-10">
+								<button type="submit" class="btn btn-primary">Calculate</button>
+							</div>
+						</div>
+			</form>
+		</div>
+	</div>
+
+	<footer class="container py-5">
+			<small>Created by the Dementia Disease Initiation (DDI) project; No guarantee or liability implied.<br>
+				Supplement of <em>Myrvoll Lorentzen et al (2021). Regression-based norms for the FAS phonemic fluency test for ages 41 – 84 based on a Norwegian sample. The Clinical Neuropsychologist.</em>
+			</small>
+    </footer>
+
+	<!-- load libs from CDN -->
+	<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
+	<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
+
+	<!-- Code for the computation -->
+	<script type="text/javascript">
+		var coefs_total	= {
+			"intercept": 23.855,
+			"edu": 1.224,
+			"SD": 10.204
+		};
+		var coefs_f = {
+			"intercept": 7.087,
+			"edu": 0.504,
+			"SD": 4.272
+		};
+		var coefs_a = {
+			"intercept": 5.929,
+			"edu": 0.336,
+			"SD": 3.518
+		};
+		var coefs_s = {
+			"intercept": 10.840,
+			"edu": 0.384,
+			"SD": 4.398
+		};
+
+		function tscore(letter, coefs){
+			var edu = parseInt($('#edu').val());
+			var value = parseInt($('#'+letter).val());
+			if(! isNaN(value)){
+				var predicted = coefs["intercept"]+(edu*coefs["edu"]);
+				var t_score = (value - predicted) / coefs["SD"] * 10 + 50;
+				// truncate in +-3 SD
+				t_score = Math.min(Math.max(t_score, 20), 80);
+				$('#t-score-'+letter).val(Math.round(t_score));
+			}
+		}
+
+		function calculate() {
+
+			try {
+
+
+				var f = parseInt($('#f').val());
+				var a = parseInt($('#a').val());
+				var s = parseInt($('#s').val());
+				var total = parseInt($('#total').val());
+				if (total === '') {
+						var total = f+a+s;
+						$('#total').val(total)
+				}
+
+				tscore('f', coefs_f);
+				tscore('a', coefs_a);
+				tscore('s', coefs_s);
+				tscore('total', coefs_total);
+
+
+				// if (f !== '' && edu !== '') {
+				//
+				// 	var predicted_f = coefs_f["intercept"]+(edu*coefs_f["edu"]);
+				// 	var f_t_score = (f - predicted_f) / coefs_f["SD"] * 10 + 50;
+				// 	$('#t-score-f').val(Math.round(f_t_score));
+				//
+				// }
+				//
+				// if (a !== '' && edu !== '') {
+				// 	var predicted_a = coefs_a["intercept"]+(edu*coefs_a["edu"]);
+				// 	var a_t_score = (a - predicted_a) / coefs_a["SD"] * 10 + 50;
+				// 	$('#t-score-a').val(Math.round(a_t_score));
+				// }
+				//
+				// if (s !== '' && edu !== '') {
+				// 	var predicted_s = coefs_s["intercept"]+(edu*coefs_s["edu"]);
+				// 	var s_t_score = (s - predicted_s) / coefs_s["SD"] * 10 + 50;
+				// 	$('#t-score-s').val(Math.round(s_t_score));
+				// }
+				//
+				// if (total !== '' && edu !== '') {
+				// 	var predicted_total = coefs_total["intercept"]+(edu*coefs_total["edu"]);
+				// 	var total_t_score = (total - predicted_total) / coefs_total["SD"] * 10 + 50;
+				// 	$('#t-score-total').val(Math.round(total_t_score));
+				// }
+
+			} catch (e) {
+				// If there is any missing data just ignore
+				console.log(e);
+			}
+
+		}
+
+		// prevent page reload on form submission
+		$('#calc').submit(function () {
+		 calculate();
+		 return false;
+		});
+
+	</script>
+</body>
+
+</html>
